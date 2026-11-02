@@ -55,13 +55,13 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x8ba6b1);
-scene.fog = new THREE.FogExp2(0x8ba6b1, 0.00016);
-const camera = new THREE.PerspectiveCamera(58, 1, 2, 12500);
+scene.fog = new THREE.FogExp2(0x8ba6b1, 0.00012);
+const camera = new THREE.PerspectiveCamera(58, 1, 2, 18000);
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
 controls.dampingFactor = 0.07;
-controls.minDistance = 65;
-controls.maxDistance = 8000;
+controls.minDistance = 35;
+controls.maxDistance = 11000;
 controls.maxPolarAngle = Math.PI / 2 - 0.018;
 controls.target.set(0, 0, 0);
 
@@ -112,10 +112,10 @@ const cameraAim=new THREE.Vector3();
 function syncBoatCamera(alpha=.12){
   const p=boat.state,heading=headingVector(p.angle),first=cameraMode==='first';
   const x=p.x,z=p.z,level=WORLD.waterReferenceY;
-  const dest=first?new THREE.Vector3(x-heading.x*26,level+29,z-heading.z*26):
-    new THREE.Vector3(x-heading.x*180-heading.z*32,level+120,z-heading.z*180+heading.x*32);
-  const focus=first?new THREE.Vector3(x+heading.x*145,level+18,z+heading.z*145):
-    new THREE.Vector3(x+heading.x*55,level+7,z+heading.z*55);
+  const dest=first?new THREE.Vector3(x-heading.x*12,level+21,z-heading.z*12):
+    new THREE.Vector3(x-heading.x*126-heading.z*16,level+75,z-heading.z*126+heading.x*16);
+  const focus=first?new THREE.Vector3(x+heading.x*108,level+16,z+heading.z*108):
+    new THREE.Vector3(x+heading.x*36,level+6,z+heading.z*36);
   camera.position.lerp(dest,alpha);
   cameraAim.lerp(focus,alpha);
   camera.up.set(0,1,0);
@@ -129,23 +129,23 @@ function setView(name) {
   const target = new THREE.Vector3(0, 0, 0);
   camera.up.set(0, 1, 0);
   if (name === 'water') {
-    target.set(-120, WORLD.waterReferenceY, -660);
-    camera.position.set(380, 205, -1220);
+    target.set(-120, WORLD.waterReferenceY, WORLD.playerSpawn.z+900);
+    camera.position.set(380, 205, WORLD.playerSpawn.z+340);
   } else if (name === 'spawn') {
     target.set(WORLD.playerSpawn.x, 0, WORLD.playerSpawn.z);
-    camera.position.set(480, 490, -1930);
+    camera.position.set(WORLD.playerSpawn.x+400, 430, WORLD.playerSpawn.z-480);
   } else if (name === 'bracu') {
     target.set(WORLD.bracu.x, 0, WORLD.bracu.z);
-    camera.position.set(510, 505, 1840);
+    camera.position.set(WORLD.bracu.x+510, 505, WORLD.bracu.z+460);
   } else if (name === 'top') {
     // +Z at the top of the screen; matches the source map north orientation.
     camera.up.set(0, 0, 1);
-    camera.position.set(0, 5200, 0.1);
+    camera.position.set(0, WORLD.size*1.4, 0.1);
   } else if (name === 'intersection') {
-    target.set(0, 0, -50);
-    camera.position.set(450, 345, -490);
+    target.set(0, 0, ROADS.horizontalCenters[2]);
+    camera.position.set(450, 345, ROADS.horizontalCenters[2]-440);
   } else {
-    camera.position.set(2950, 3250, -3350);
+    camera.position.set(WORLD.size*.83, WORLD.size*.89, -WORLD.size*.96);
   }
   camera.lookAt(target);
   controls.target.copy(target);

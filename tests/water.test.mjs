@@ -7,9 +7,10 @@ import { WORLD } from '../docs/world/config.js';
 const here=new URL('../docs/',import.meta.url);
 const read=path=>readFileSync(new URL(path,here),'utf8');
 
-test('floodwater height and map scale preserve the original project',()=>{
+test('3m water elevation stays constant while all surface mappings use expanded extent',()=>{
  assert.equal(WORLD.waterReferenceY,36);
- assert.equal(WORLD.size,3300);
+ assert.equal(WORLD.size,6000);
+ assert.equal(WORLD.waterSize,6400);
  assert.equal(WORLD.floodDepthMeters,3);
  assert.equal(WORLD.gameUnitsPerMeter,12);
 });
@@ -22,6 +23,9 @@ test('water renderer is a separate module, with GPU simulation and optical passe
  assert.match(s,/fresnel/);
  assert.match(s,/SubmergedFloorCaustics/);
  assert.match(s,/waterReferenceY/);
+ assert.match(s,/PlaneGeometry\(WORLD.waterSize,WORLD.waterSize/);
+ assert.match(s,/uWaterHalfExtent/);
+ assert.match(s,/uWaterSize/);
 });
 test('water preserves the BRACU dry clearing and ripple interaction hook',()=>{
  const s=read('water/create-water.js');
@@ -37,6 +41,8 @@ test('GPU waves use height/velocity ping-pong texture, fallback exists',()=>{
  assert.match(s,/HalfFloatType/);
  assert.match(s,/DataTexture/);
  assert.match(s,/EXT_color_buffer_float/);
+ assert.match(s,/WORLD.waterHalfExtent/);
+ assert.match(s,/WORLD.waterSize/);
 });
 test('site keeps GitHub Pages static import-map arrangement and the original sounds',()=>{
  const html=read('index.html');

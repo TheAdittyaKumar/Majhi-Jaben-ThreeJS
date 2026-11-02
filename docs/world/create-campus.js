@@ -54,7 +54,7 @@ export function createCampus(scene){
  const towerSign=sign('BRAC UNIVERSITY',220,35,56);towerSign.name='tower-sign';towerSign.position.set(0,346,z-CAMPUS.tower.depth/2-11);
  // Landscaping within the campus footprint, deliberately leaving the entrance route open.
  for(let row=0;row<3;row++)for(const side of [-1,1]){
-  const x=side*(130+row*34), tz=1230+row*50;
+  const x=side*(130+row*34), tz=CAMPUS.center.z-148+row*50;
   box(root,`garden-${row}-${side}`,35,3,38,x,3,tz,grass);
   cyl(root,`tree-trunk-${row}-${side}`,3,4,29,x,20,tz,trunk);
   const crown=new THREE.Mesh(new THREE.IcosahedronGeometry(19,1),trees);

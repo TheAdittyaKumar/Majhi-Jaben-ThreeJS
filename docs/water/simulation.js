@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { WORLD } from '../world/config.js';
 
 /**
  * Inspired by Evan Wallace's MIT-licensed GPU heightfield approach:
@@ -81,11 +82,11 @@ export class HeightfieldSimulation {
  get texture(){return this.gpu?this.a.texture:this.fallback;}
  addDrop(x,z,radius,strength){
   if(!this.gpu)return;
-  const u=(x+1800)/3600, v=(1800-z)/3600;
+  const u=(x+WORLD.waterHalfExtent)/WORLD.waterSize, v=(WORLD.waterHalfExtent-z)/WORLD.waterSize;
   if(u<0||u>1||v<0||v>1)return;
   // Bound queued impulses if the simulation is paused while the player moves.
   if(this.drops.length>=24)this.drops.shift();
-  this.drops.push(new THREE.Vector4(u,v,radius/3600,strength));
+  this.drops.push(new THREE.Vector4(u,v,radius/WORLD.waterSize,strength));
  }
  step(){
   if(!this.gpu)return;

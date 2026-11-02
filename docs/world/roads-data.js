@@ -1,7 +1,7 @@
 /**
- * Phase 02 · Road topology from the original MajhiJaben_FinalVersion.py.
- * RoadWidth=210, VerticalRoadPositions and HorizontalRoadPositions are kept
- * verbatim. Three.js uses X/Z for this horizontal map and Y for height.
+ * Phase 06.2 · Re-spaced original 5×5 road topology over a 500m neighborhood.
+ * Road centers and roadway width were intentionally redesigned for scale.
+ * Three.js uses X/Z for the map and Y for height.
  *
  * This file deliberately imports no Three.js or browser APIs so gameplay,
  * collision, pathfinding, minimaps, and Node tests can reuse the same data.
@@ -9,14 +9,14 @@
 import { WORLD } from './config.js';
 
 export const ROADS = Object.freeze({
-  verticalCenters: Object.freeze([-1100, -550, 0, 550, 1100]),
-  horizontalCenters: Object.freeze([-1150, -600, -50, 500, 1050]),
-  width: 210,
-  halfWidth: 105,
+  verticalCenters: Object.freeze([-2000, -1000, 0, 1000, 2000]),
+  horizontalCenters: Object.freeze([-2050, -1050, -50, 950, 1950]),
+  width: 180,
+  halfWidth: 90,
   sidewalkWidth: 26,
   curbWidth: 5,
-  centerDashLength: 44,
-  centerDashPeriod: 170,
+  centerDashLength: 34,
+  centerDashPeriod: 155,
   centerDashStart: -WORLD.halfExtent + 95,
 });
 
@@ -60,7 +60,7 @@ export function isOnRoad(x, z) {
   return type === 'road' || type === 'intersection';
 }
 
-/** Exact building/land-block ranges from the original getCityBlockRanges(). */
+/** City-block ranges from the rescaled corridors; no longer the original source positions. */
 export function getCityBlockRanges(centers) {
   const ranges = [];
   let cursor = -WORLD.halfExtent;

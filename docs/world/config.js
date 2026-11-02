@@ -1,18 +1,22 @@
 /**
- * Phase 01: original game coordinates preserved from custom WebGL game.js.
- * Coordinate system: X east/west, Y height, Z north/south (same as old game).
- * NO scene geometry in this file. Later systems must import these constants.
+ * Phase 06.2: rescaled fictional neighborhood (500 x 500 m).
+ * X east/west, Y height, Z north/south; 12 units = 1 metre.
+ * Original Phase 1–6 coordinates are intentionally migrated (not retained).
+ * All geometry, water UVs, cameras, collision and future missions import this data.
  */
 export const WORLD = Object.freeze({
-  halfExtent: 1650,
-  size: 3300,
+  halfExtent: 3000,
+  size: 6000,
+  waterMargin: 200,
+  waterHalfExtent: 3200,
+  waterSize: 6400,
   roadY: 0,
   waterReferenceY: 36,
   floodDepthMeters: 3,
   gameUnitsPerMeter: 12,
-  playerSpawn: Object.freeze({ x: 0, y: 0, z: -1450, headingDegrees: 90 }),
-  bracu: Object.freeze({ x: 0, y: 0, z: 1378, clearingRadius: 365 }),
-  dropOff: Object.freeze({ x: 0, y: 0, z: 1080 }),
+  playerSpawn: Object.freeze({ x: 0, y: 0, z: -2650, headingDegrees: 90 }),
+  bracu: Object.freeze({ x: 0, y: 0, z: 2600, clearingRadius: 365 }),
+  dropOff: Object.freeze({ x: 0, y: 0, z: 2220 }),
 });
 
 export function insidePlayableArea(x, z, margin = 0) {

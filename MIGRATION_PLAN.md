@@ -1,14 +1,17 @@
-# Majhi Jaben?! Three.js — migration phases
+# Majhi Jaben?! — incremental Three.js rebuild
 
-- [x] Phase 01 — original world size and anchors
-- [x] Phase 02 — original roads, lanes and intersections
-- [x] Phase 03 — Dhaka-style buildings and rooftop details
-- [x] Phase 04 — BRAC University and entry / drop-off
-- [x] Phase 05 — GPU heightfield floodwater, optical shading and rain interaction
-- [x] Phase 06 — player rescue boat, paddles, W/S/A/D motion, water wake and boat cameras
-- [ ] Phase 07 — boat operator / majhi character, rowing animation, first-person arms (without passengers)
-- [ ] Phase 08 — other vehicles (rickshaw/CNG/cars), traffic and environment props
-- [ ] Phase 09 — passenger characters, rescue missions, minimap and voice dialogue
-- [ ] Phase 10 — campus ID check, scoring, UI, events, polish and integration
+- [x] Phase 01 — establish coordinate system
+- [x] Phase 02 — roads and intersections
+- [x] Phase 03 — procedural Dhaka buildings
+- [x] Phase 04 — BRACU campus
+- [x] Phase 05 — floodwater and shader rendering
+- [x] Phase 06 — boat and paddle movement
+- [x] Phase 06.1 — fix reversed A/D steering
+- [x] **Phase 06.2 — correct scale of city, buildings, boat, cameras, water UVs, spawn and dock**
+- [ ] **Phase 06.3 — fix cropped/partial water reflections and tune water optics**
+- [ ] Phase 07 — majhi character and rowing body/arms
+- [ ] Phase 08 — Dhaka-specific architecture and vehicles / street props
+- [ ] Phase 09 — stranded passengers, rescue missions, minimap, Bangla dialogue
+- [ ] Phase 10 — BRACU ID check, scoring, remaining UI and integration
 
-Each new phase should preserve working code, use source-game coordinates, and be tested independently. Phase 05 and later visual quality needs a real browser review after deployment; structural tests alone do not prove WebGL shader or 3D model correctness.
+Every change must preserve the GitHub Pages `/docs` static deployment. **Never assume old gameplay coordinates remain correct after Phase 06.2**; check `SCALE_NOTES.md` for the new coordinate system.

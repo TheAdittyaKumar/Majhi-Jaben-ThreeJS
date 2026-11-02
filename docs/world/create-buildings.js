@@ -9,7 +9,7 @@ function box(group,w,h,d,x,y,z,material,cast=false){
  m.position.set(x,y,z);m.castShadow=cast;m.receiveShadow=true;group.add(m);return m;
 }
 function addFacade(b,lot,matWindow,metal,trim){
- const floors=Math.max(3,Math.floor(lot.height/39));
+ const floors=lot.floors;
  const floorH=lot.height/floors;
  // Windows are kept in one instanced draw call per building to avoid a large scene graph.
  const positions=[];

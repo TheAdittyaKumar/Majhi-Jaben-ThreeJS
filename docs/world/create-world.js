@@ -68,7 +68,7 @@ export function createWorldReference(scene) {
     ]),
     new THREE.LineBasicMaterial({ color: 0xe3bc79 })
   );
-  outline.name = 'PlayableBoundary3300x3300';
+  outline.name = `PlayableBoundary${WORLD.size}x${WORLD.size}`;
   guides.add(outline);
 
   function marker(name, coordinates, tint, ringSize, subtitle = '') {

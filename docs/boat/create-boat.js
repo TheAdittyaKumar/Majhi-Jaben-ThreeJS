@@ -1,19 +1,22 @@
 import * as THREE from 'three';
 import { WORLD } from '../world/config.js';
-import { BOAT, headingVector, boatFitsWorld, approachStep } from './boat-data.js';
+import { BOAT, headingVector, boatFitsWorld, approachStep, steeringInput } from './boat-data.js';
 
 /**
  * Stylized Dhaka rescue boat: open painted timber hull, curved bow,
  * gunwale trims, thwart seats, planking and two animated traditional oars.
  * Entire mesh is generated in Three.js; no external model download.
- * Source proportions intentionally follow the eight station cross-sections
- * from the original PyOpenGL/WebGL boat, enlarged for passenger capacity.
+ * Source proportions follow the eight station cross-sections. The geometry
+ * receives a uniform horizontal footprint correction for a 7.5m rescue hull.
  */
 export function createPlayerBoat(scene,water){
   const group=new THREE.Group();
   group.name='PlayerBoat_ThreeJS_Phase06';
   scene.add(group);
   const hull=new THREE.Group();hull.name='HullRockAndBob';group.add(hull);
+  // Correct original ~12.7m × 4.75m footprint to ~7.5m × 2.6m.
+  // Y is deliberately unchanged to preserve freeboard and paddle depth.
+  hull.scale.set(.54,1,.59);
   const disposeGeometries=[];
   const mats=[];
   function material(options){const m=new THREE.MeshStandardMaterial(options);mats.push(m);return m;}
@@ -142,7 +145,7 @@ export function createPlayerBoat(scene,water){
   function emitFoam(x,z,size=1){
     const p=foam[foamIndex++%foam.length];p.age=0;p.initialSize=size;
     p.mesh.position.set(x,WORLD.waterReferenceY+.58,z);
-    p.mesh.scale.set(size*13,size*6,1);p.mesh.material.opacity=.36;
+    p.mesh.scale.set(size*10,size*5,1);p.mesh.material.opacity=.36;
     p.mesh.visible=true;
   }
   function updateFoam(dt){
@@ -150,8 +153,8 @@ export function createPlayerBoat(scene,water){
       if(f.age>=1.4)continue;
       f.age+=dt;
       const life=Math.min(1,f.age/1.4);
-      f.mesh.scale.x=f.initialSize*(13+life*45);
-      f.mesh.scale.y=f.initialSize*(6+life*22);
+      f.mesh.scale.x=f.initialSize*(10+life*28);
+      f.mesh.scale.y=f.initialSize*(5+life*14);
       f.mesh.material.opacity=(1-life)*.34;
       if(life>=1)f.mesh.visible=false;
     }
@@ -159,14 +162,14 @@ export function createPlayerBoat(scene,water){
   function update(dt,keys){
     const delta=Math.min(.05,Math.max(0,dt));elapsed+=delta;
     const forwards=(keys.has('w')||keys.has('arrowup')?1:0)-(keys.has('s')||keys.has('arrowdown')?1:0);
-    const steering=(keys.has('a')||keys.has('arrowleft')?1:0)-(keys.has('d')||keys.has('arrowright')?1:0);
+    const steering=steeringInput(keys);
     state.boost=keys.has(' ')&&forwards>0;
     const target=forwards===0?0:(forwards>0?BOAT.forwardSpeed:BOAT.backwardSpeed)*forwards*(state.boost?BOAT.boostFactor:1);
     state.speed+= (target-state.speed)*Math.min(1,delta*(forwards?4.5:3.3));
     if(Math.abs(state.speed)<.1)state.speed=0;
     const oldAngle=state.angle;
     if(steering){
-      state.angle=(state.angle+steering*BOAT.turnRateDegrees*delta*(.35+.65*Math.min(1,Math.abs(state.speed)/90))+360)%360;
+      state.angle=(state.angle+steering*BOAT.turnRateDegrees*delta*(.35+.65*Math.min(1,Math.abs(state.speed)/BOAT.forwardSpeed))+360)%360;
       if(!boatFitsWorld(state.x,state.z,state.angle))state.angle=oldAngle;
     }
     state.blocked=false;
@@ -201,14 +204,14 @@ export function createPlayerBoat(scene,water){
     if(state.wakes&&water.state.visible&&!water.state.paused&&state.rowing){
       wakeClock+=delta;strokeClock+=delta;
       if(wakeClock>=.14){wakeClock=0;
-        const sternX=state.x-front.x*65,sternZ=state.z-front.z*65;
-        water.addInteraction(sternX,sternZ,-.23-Math.min(.23,rowEnergy*.19),38);
-        for(const s of [-1,1])emitFoam(sternX+port.x*s*13,sternZ+port.z*s*13,.85);
+        const sternX=state.x-front.x*(BOAT.length*.43),sternZ=state.z-front.z*(BOAT.length*.43);
+        water.addInteraction(sternX,sternZ,-.23-Math.min(.23,rowEnergy*.19),25);
+        for(const s of [-1,1])emitFoam(sternX+port.x*s*8,sternZ+port.z*s*8,.55);
       }
       if(strokeClock>=BOAT.rowingCycleSeconds){strokeClock-=BOAT.rowingCycleSeconds;
         for(const s of [-1,1]){
-          const x=state.x+port.x*s*67-front.x*12,z=state.z+port.z*s*67-front.z*12;
-          water.addInteraction(x,z,.38,28);emitFoam(x,z,.48);
+          const x=state.x+port.x*s*36-front.x*9,z=state.z+port.z*s*36-front.z*9;
+          water.addInteraction(x,z,.38,20);emitFoam(x,z,.36);
         }
       }
     }else {wakeClock=0;strokeClock=0;}

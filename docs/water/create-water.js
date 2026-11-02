@@ -130,7 +130,13 @@ const surfaceFragment = `
  }
 `;
 // Shader injection keeps GLSL source readable and avoids a generated duplicate file.
-const waterFragment=surfaceFragment.replace('uniform float uWaveContrast;','uniform float uWaveContrast;\n uniform float uSimSize;');
+const waterFragment=surfaceFragment.replace(
+  'uniform float uWaveContrast;',
+  `uniform float uWaveContrast;
+ uniform float uSimSize;
+ uniform float uWaterHalfExtent;
+ uniform float uWaterSize;`
+);
 
 const causticVertex = `
  varying vec2 vUv;
@@ -143,6 +149,8 @@ const causticFragment = `
  varying vec3 vWorld;
  uniform sampler2D uHeightfield;
  uniform float uSimSize;
+ uniform float uWaterHalfExtent;
+ uniform float uWaterSize;
  uniform float uTime;
  uniform float uStrength;
  uniform vec2 uCampus;
@@ -150,7 +158,7 @@ const causticFragment = `
  void main(){
   float dry=1.0-smoothstep(uCampusRadius-90.0,uCampusRadius+40.0,length(vWorld.xz-uCampus));
   if(dry>.995)discard;
-  vec2 uv=vec2((vWorld.x+1800.0)/3600.0,(1800.0-vWorld.z)/3600.0);
+  vec2 uv=vec2((vWorld.x+uWaterHalfExtent)/uWaterSize,(uWaterHalfExtent-vWorld.z)/uWaterSize);
   vec2 d=vec2(1.0/uSimSize);
   float h=texture2D(uHeightfield,uv).r;
   float hX=(texture2D(uHeightfield,uv+d*vec2(1,0)).r+texture2D(uHeightfield,uv-d*vec2(1,0)).r-2.0*h);
@@ -165,7 +173,7 @@ const causticFragment = `
 
 export function createWater(scene, renderer, camera, opts={}){
  const state={quality:opts.quality||'high',paused:false,visible:true,rain:true,reflections:true};
- const qualitySpec={high:{sim:256,mesh:176,render:.60},medium:{sim:192,mesh:136,render:.42},low:{sim:128,mesh:96,render:.30}};
+ const qualitySpec={high:{sim:384,mesh:200,render:.60},medium:{sim:256,mesh:152,render:.42},low:{sim:128,mesh:96,render:.30}};
  const q=qualitySpec[state.quality]||qualitySpec.high;
  const sim=new HeightfieldSimulation(renderer,q.sim);
  // Thin water plane at the exact source-game flood elevation.
@@ -174,20 +182,22 @@ export function createWater(scene, renderer, camera, opts={}){
   uResolution:{value:new THREE.Vector2(1,1)},uEye:{value:new THREE.Vector3()},uReflectionMatrix:{value:new THREE.Matrix4()},
   uTime:{value:0},uWaveScale:{value:2.2},uNear:{value:camera.near},uFar:{value:camera.far},
   uRain:{value:1},uReflectionStrength:{value:.93},uWaveContrast:{value:4.0},uSimSize:{value:q.sim},
-  uCampus:{value:new THREE.Vector2(WORLD.bracu.x,WORLD.bracu.z)},uCampusRadius:{value:WORLD.bracu.clearingRadius}
+  uCampus:{value:new THREE.Vector2(WORLD.bracu.x,WORLD.bracu.z)},uCampusRadius:{value:WORLD.bracu.clearingRadius},
+  uWaterHalfExtent:{value:WORLD.waterHalfExtent},uWaterSize:{value:WORLD.waterSize}
  };
  const waterMaterial=new THREE.ShaderMaterial({
   uniforms,vertexShader:surfaceVertex,fragmentShader:waterFragment,
   transparent:true,depthWrite:false,side:THREE.DoubleSide,polygonOffset:false,
  });
- const plane=new THREE.Mesh(new THREE.PlaneGeometry(3600,3600,q.mesh,q.mesh),waterMaterial);
+ const plane=new THREE.Mesh(new THREE.PlaneGeometry(WORLD.waterSize,WORLD.waterSize,q.mesh,q.mesh),waterMaterial);
  plane.rotation.x=-Math.PI/2;plane.position.y=WORLD.waterReferenceY;
  plane.name='Phase05HeightfieldReflectiveFloodwater';
  plane.frustumCulled=false; // wave deformation can extend beyond geometry bounds
  plane.renderOrder=15;
  scene.add(plane);
  const causticMaterial=new THREE.ShaderMaterial({vertexShader:causticVertex,fragmentShader:causticFragment,
-  uniforms:{uHeightfield:{value:sim.texture},uSimSize:{value:q.sim},uTime:{value:0},uStrength:{value:1.0},uCampus:{value:uniforms.uCampus.value},uCampusRadius:{value:WORLD.bracu.clearingRadius}},
+  uniforms:{uHeightfield:{value:sim.texture},uSimSize:{value:q.sim},uTime:{value:0},uStrength:{value:1.0},uCampus:{value:uniforms.uCampus.value},uCampusRadius:{value:WORLD.bracu.clearingRadius},
+    uWaterHalfExtent:{value:WORLD.waterHalfExtent},uWaterSize:{value:WORLD.waterSize}},
   transparent:true,depthWrite:false,depthTest:true,blending:THREE.AdditiveBlending,side:THREE.DoubleSide,
  });
  const caustic=new THREE.Mesh(new THREE.PlaneGeometry(WORLD.size,WORLD.size),causticMaterial);
@@ -229,7 +239,7 @@ export function createWater(scene, renderer, camera, opts={}){
   while(accumulator>=1/60&&passes<2){
    if(state.rain){
     for(let i=0;i<3;i++){
-     const x=(random()*2-1)*1740,z=(random()*2-1)*1740;
+     const x=(random()*2-1)*(WORLD.halfExtent-50),z=(random()*2-1)*(WORLD.halfExtent-50);
      const nearCampus=Math.hypot(x-WORLD.bracu.x,z-WORLD.bracu.z)<WORLD.bracu.clearingRadius;
      if(!nearCampus)sim.addDrop(x,z,22+random()*34,(random()-.35)*.34);
     }

@@ -1,64 +1,57 @@
-# Majhi Jaben?! — Three.js Edition · Phase 06: Row the Rescue Boat
+# Majhi Jaben?! — Three.js Edition · Phase 06.2: World Scale & Proportions
 
-Phase 06 **continues directly from Phase 05**; it is not a separate demo. The main game is being reconstructed in small, testable systems for a **new GitHub Pages repository**.
+**This is the next update for the existing GitHub Pages project, not a separate tech demo.** It builds on Phase 06.1 (including fixed **A = left / D = right** steering). The repository still publishes from **`main` → `/docs`**, with Three.js r187 and WebGL 2.
 
-## New in Phase 06
+## What changed in Phase 06.2
 
-- A **player-controlled rescue boat** built entirely with Three.js `BufferGeometry`, `MeshStandardMaterial`, curved side-panels, detailed gunwales, interior wooden planking, bench seats, trim, rope fittings, bow post, and a curved pointed hull.
-- Two separate animated **port/starboard paddles**, based on the original game's 0.65-second rowing rhythm.
-- **W/S** forward/backward rowing; **A/D** turning, **Space** temporary speed boost; collisions with city building footprints, world boundaries and BRACU's dry interior.
-- Animated **bob/pitch/roll**, and **GPU wake disturbances** injected into the existing Phase 05 heightfield (via `water.addInteraction`). Separate lightweight surface foam rings make wake movement readable; puddle-scale visual feedback still works if heightfield float textures are unavailable.
-- Two chase/first-person boat camera modes; keep all original **orbit-map inspector** views and previous water/environment toggles.
-- Reuse existing `docs/audio/paddle_1.mp3`, `paddle_2.mp3`, `paddle_3.mp3` for optional paddle audio. Playback begins only after keyboard interaction because browsers block unsolicited audio.
+We used 12 game units per metre **consistently**, instead of enlarging the boat and squeezing buildings into a tiny map:
 
-**Not restored yet:** 3D human characters, passengers/boarding, AI boats, vehicles, full missions, BRACU ID-card sequences, minimap, and final-game UI. This phase is an operable visual shell, not the complete game.
+| Feature | Phase 06.1 | Phase 06.2 |
+| --- | --- | --- |
+| Map | 3,300 × 3,300 units ≈ 275 × 275 m | **6,000 × 6,000 units ≈ 500 × 500 m** |
+| Rescue boat | 152 × 57 ≈ 12.7 × 4.75 m | **90 × 31 ≈ 7.5 × 2.6 m** |
+| Main road width | 210 units ≈ 17.5 m | **180 units ≈ 15 m** |
+| Road topology | 5 N–S / 5 E–W / 25 junctions | **same topology, newly spaced** |
+| Typical buildings | many low 6–13 m blocks | **140 buildings, 3–9 floors** (≈9.5–31.5 m tall) |
+| Water level above roads | 36 units = 3 m | **unchanged** |
+| Water field | 3,600 units wide, 256² at high | **6,400 units wide, 384² at high** |
+| Boat starting point | (0, -1450) | **(0, -2650)** |
+| BRACU center | (0, 1378) | **(0, 2600)** |
+| BRACU dock | (0, 1080) | **(0, 2220)**, on the wet shoreline |
 
-## Controls
+### Technical notes
 
-| Control | Action |
-|---|---|
-| `W` or ↑ | Row forward |
-| `S` or ↓ | Row backward |
-| `A` / `D` or ← / → | Steer |
-| `Space` while moving forward | Boost |
-| `C` | Switch between chase and first-person ride cameras |
-| `R` | Reset to original starting coordinates |
-| Mouse drag / wheel in inspector camera | Orbit / zoom world |
-| Click/tap water | Make independent manual ripple |
+- **Boat:** The hull is scaled in X/Z, while its vertical freeboard remains unchanged. The collision geometry, foam and wave wake impulses have been scaled to match. Movement speed is also reduced from the unnaturally fast Phase 06.1 value; the boat remains intentionally arcade-like rather than a real hydraulic model.
+- **Roads/buildings:** Re-spacing corridors and re-generating building lots avoids simply magnifying every structure. There are still 25 intersections. Setbacks keep balconies off roads; buildings maintain realistic floor heights and avoid overlap.
+- **Water:** All heightfield impulse coordinates and caustic shader lookup coordinates use `WORLD.waterHalfExtent` / `WORLD.waterSize` rather than hardcoded map bounds. Rain drops now span the full map, and water continues past the boundary. The BRACU clearing moves with campus coordinates.
+- **Camera:** Chase, first-person and inspector camera offsets are adjusted for the smaller boat and larger world.
+- **Campus:** The geometry is unchanged except moving along +Z to the new site; gate, plaza, trees and drop-off all follow the new anchors.
 
-The **Ride boat** and **First person** buttons enter follow mode. The other camera buttons return to the original orbit inspector. The original game world coordinate system remains: X/Z horizontal, Y vertical; boat starts at **(0, -1450)** facing positive Z toward the BRACU area.
+**Scope:** Phase 06.2 fixes scale and placement. It does **not** fix the partial building reflections seen in earlier browser screenshots; that will be **Phase 06.3**. Building architectural variety, vehicles, passengers and the majhi character also remain future work.
 
-## Deploy to GitHub Pages
+## Update existing repository using the PATCH ZIP (recommended)
 
-1. Create or open your **new** repository.
-2. Upload the **contents** of the complete ZIP to the **repository root** so `docs/index.html` is directly under `/docs`.
-3. In repository **Settings → Pages**, deploy from `main` branch and `/docs` folder.
-4. Wait for the site to publish; open on a desktop/laptop browser with WebGL 2 enabled and working internet. The library uses a version-pinned Three.js `0.187.0` import map CDN (no build needed).
+1. Download the *Phase 06.2 Patch* archive, extract it somewhere **outside** the Git project.
+2. Copy its contents (`docs/`, `tests/`, `README.md`, `MIGRATION_PLAN.md`, `SCALE_NOTES.md`) **over** the matching files at the root of your already-published `Majhi-Jaben-ThreeJS` VS Code folder.
+3. In VS Code Source Control, stage all changes and commit: `Phase 06.2 - Correct world and boat scale`.
+4. Click **Sync Changes** / **Push**; GitHub Pages will redeploy from `/docs`.
+5. Hard-refresh using **Ctrl + Shift + R** and test A/D, the boat’s first-person camera, water ripples, the full road network, and BRACU docking.
 
-If using the lightweight package instead of full, only the three paddle audio clips are included; the full 200-file archive is in the complete package for future voice integration.
+If you are unsure whether Phase 06.1 was installed, use the **full Phase 06.2 ZIP** instead; it contains all Phase 06.1 steering changes. Never create a second repository for the next phase.
 
-For local test with a web server, run:
+## Run and test
 
 ```bash
+npm test
 python -m http.server 8080 --directory docs
 ```
 
-Then open `http://localhost:8080`.
+Open http://localhost:8080 in a desktop browser. Note: browser networking must allow the pinned Three.js CDN import. `npm test` validates map topology, collision and static integration, **not GPU shader compilation, rendering or framerate**. Test the deployed game visually before continuing to Phase 06.3.
 
-## Structure and testing
+## Existing content retained
 
-- `docs/boat/boat-data.js` — dimensions, original controls, world/building collision, and docking proximity. Independent of Three.js and testable in Node.
-- `docs/boat/create-boat.js` — curved hull geometry, wooden details, dual animated oars, surface-foam pool, keyboard movement, audio, water disturbance injection.
-- `docs/main.js` — Three.js scene and camera controls, keyboard state, Phase 05 water integration.
-- `docs/water/` — **unchanged** Phase 05 GPU heightfield and optical rendering.
-- `docs/world/` — **unchanged** Phase 01–04 world, roads, city buildings, BRACU campus.
-- `docs/audio/` — preserved unchanged in the complete project (200 files).
-- `tests/boat.test.mjs` — movement/heading, dock accessibility, collision boundaries, source integration, and import-map tests.
+The complete package preserves the same **200 original audio files** with unchanged paths and bytes. No current gameplay voice trigger logic was added or changed; voice and ID-card gameplay return in later phases. The lightweight package contains only the paddle samples. Review rights to third-party clips before public release.
 
-Run `npm test`. This verifies structure and collision logic but **cannot verify visually how Three.js renders**. Browser graphics and framerate still need to be checked on a deployed site. In particular, Phase 05 water shaders remain visually unverified in this environment; Phase 06 does not claim the final water appearance is production-ready.
+## Credits
 
-## Water technique credit
-
-The underlying GPU heightfield design is adapted from Evan Wallace's MIT-licensed WebGL Water project: https://madebyevan.com/webgl-water/. Boat and oar impulses use Phase 05's existing `water.addInteraction(x,z,strength,radius)` interface; they are not full fluid/rigid-body hydrodynamics.
-
-Review licensing before publicly distributing third-party meme clips. Existing audio filenames were not renamed or altered.
+GPU heightfield inspiration: Evan Wallace, [WebGL Water](https://madebyevan.com/webgl-water/). This game uses artist-directed water optics, not a full Navier–Stokes solver.
