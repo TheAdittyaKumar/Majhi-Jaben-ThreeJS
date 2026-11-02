@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#102632">
+  <meta name="description" content="Majhi Jaben?! Three.js Edition — Phase 06 rowable wooden rescue boat, animated paddles and interactive wakes, based on the original CSE423 game map.">
+  <title>Majhi Jaben?! — Three.js Edition · Phase 06</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.187.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="./main.js"></script>
+</head>
+<body>
+  <main id="app">
+    <canvas id="world" aria-label="Three.js flooded Dhaka for Majhi Jaben"></canvas>
+    <div id="failure" class="failure" hidden></div>
+    <header class="hero">
+      <p class="eyebrow">MAJHI JABEN?! · THREE.JS EDITION</p>
+      <h1>Phase 06 · Get in the Boat!</h1>
+      <p>Our first rowable rescue boat is afloat. Take the helm, paddle toward BRACU and watch the wakes interact with the Evan Wallace-inspired water.</p>
+      <span id="status" role="status">Loading WebGL 2…</span>
+      <p class="road-stats" id="road-summary">Loading road network…</p>
+    </header>
+    <aside class="controls" aria-label="Campus inspection controls">
+      <p class="smallheading">EXPLORE THE FLOODED CITY</p>
+      <p class="hint boat-help"><strong>W / S</strong> row · <strong>A / D</strong> steer · <strong>Space</strong> boost · <strong>C</strong> change ride camera · <strong>R</strong> reset</p>
+      <div class="buttons">
+        <button data-view="boat" class="boat-button">Ride boat</button>
+        <button data-view="firstperson" class="boat-button">First person</button>
+        <button data-view="water">Water close-up</button>
+        <button data-view="overview">Overview</button>
+        <button data-view="top">Top-down</button>
+        <button data-view="spawn">Starting point</button>
+        <button data-view="bracu">BRACU area</button>
+        <button data-view="intersection" class="button-wide">Intersection close-up</button>
+      </div>
+      <div class="toggles">
+        <label class="guide-toggle"><input type="checkbox" id="toggle-boat" checked> Player boat</label>
+        <label class="guide-toggle"><input type="checkbox" id="toggle-wakes" checked> Hull wakes and splashes</label>
+        <label class="guide-toggle"><input type="checkbox" id="toggle-paddle-audio" checked> Paddle sounds</label>
+        <label class="guide-toggle"><input type="checkbox" id="toggle-water" checked> Floodwater</label>
+        <label class="guide-toggle"><input type="checkbox" id="toggle-rain" checked> Rain ripples</label>
+        <label class="guide-toggle"><input type="checkbox" id="toggle-reflections" checked> Environment reflections</label>
+        <label class="guide-toggle"><input type="checkbox" id="toggle-pause"> Pause waves</label>
+        <label class="guide-toggle"><input type="checkbox" id="toggle-buildings" checked> Buildings</label>
+        <label class="guide-toggle"><input type="checkbox" id="toggle-campus" checked> BRAC University campus</label>
+        <label class="guide-toggle"><input type="checkbox" id="toggle-markings" checked> Road markings</label>
+        <label class="guide-toggle"><input type="checkbox" id="toggle-crossings" checked> Zebra crossings</label>
+        <label class="guide-toggle"><input type="checkbox" id="toggle-sidewalks" checked> Sidewalks and curbs</label>
+        <label class="guide-toggle"><input type="checkbox" id="toggle-guides"> Coordinates and anchors</label>
+      </div>
+      <button id="reset-boat" class="reset-boat">Reset boat to start</button>
+      <p id="boat-summary" class="hint water-summary">Loading boat…</p>
+      <p id="water-summary" class="hint water-summary">Checking GPU features…</p>
+      <p class="hint">Drag to orbit · Scroll to zoom · Right-drag to pan</p>
+      <p class="hint">Click/tap the water to send a ripple outward. The BRACU campus is dry. Characters, vehicles and full rescue missions are still upcoming phases.</p>
+    </aside>
+    <div id="boat-hud"><strong>🛶 MAJHI JABEN?!</strong><span id="boat-readout">Boat loading…</span></div>
+    <footer><span id="coordinate-readout">Loading coordinates…</span><span id="pointer-readout">Hover the map to inspect coordinates</span></footer>
+  </main>
+</body>
+</html>
